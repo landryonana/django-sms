@@ -260,6 +260,12 @@
 
 
 @media screen and (max-width: 575px){
+    .user-profile-info, .user-profile-image{
+        margin-top: 15px;
+    }
+    .wrapper-user{
+        padding: 65px 0px;
+    }
     .side-liste{
         border-bottom: 2px solid #006c69;
     }
