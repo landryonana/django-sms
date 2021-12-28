@@ -4,11 +4,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 
-from . import views
+from evangelisation import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("accounts.urls")),
+    path('', 
+        views.notification_app_index, 
+        name="notification_app_index"
+    ),
     path('notification/', include("evangelisation.urls")),
 ]
 
