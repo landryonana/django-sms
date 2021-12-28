@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+
+{% block titre %}
+    vh-cam|Messages
+{% endblock titre %}
+
+
+
+{% block hamburger %}
+    <div class="menu-btn">
+        <i class="fas fa-bars"></i>
+        <i class="fas fa-times"></i>
+    </div>
+{% endblock hamburger %}
+
+
+
+{% block sidebar %}
+    {% include 'layouts/_sidebar.html' %}
+{% endblock sidebar %}
+
+
+
+{% block content %}
+<div class="home">
+    <div class="wrapper-evang">
+        <div class="row">
+            <div class="form-group">
+                
+                {% if messages %}
+                    <ul class="messages">
+                        {% for message in messages %}
+                        <li class="{{ message.tags }}">
+                            {{ message|safe }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                    
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="wrapper-detail-evang">
+                    <div class="evang-dropdow">
+                        <form action="{% url 'notification:notification_app_index' %}">
+                            <select onchange="form.submit()" name="liste-message" id="liste-evang">
+                                {% for msg in messages_select %}
+                                    <option 
+                                    {% if msg.id == msg_select.id %}
+                                        selected="true"
+                                    {% endif %}
+                                         value="{{msg.id}}">Messages {{msg.publish|date:"d M Y H:s"}}</option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </div>
+                    <dl class="dl-horizontal"> 
+                        <h2>
+                            {% if message.id %}
+                                Mofifier un message
+                            {% else %}
+                                Envoyer un message
+                            {% endif %}
+                        </h2>
+                        <div class="pt-2">
+                            <form action="{% if message.id %}
+                                    {% url 'notification:notification_app_index' message.id %}
+                                {% else %}
+                                    {% url 'notification:notification_app_index' %}
+                                {% endif %}" method="POST">
+                                {% csrf_token %}
+                                <div class="row">
+                                    {% for field in form %}
+                                        <div class="col-md-6">
+                                            <div class="form-group pd {% if field.errors %}has-error{% endif %}">
+                                                <label for="{{ field.id_for_label }}">{{field.label}}</label>
+                                                {% render_field field class="form-control" %}
+                                                <small class="form-text text-muted">{{ field.help_text|safe }}</small>
+                                                {% for error in field.errors %}
+                                                    <p class="pt-2 pb-2 pl-2 pr-2" style="background-color: #dc3545; border-radius: 7px;">
+                                                        {{ error }}
+                                                    </p>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                    
+                                </div>
+                                <div class="row">
+                                    <div class="form-group text-center">
+                                        
+                                        {% if modifié %}
+                                            <button type="submit" class="btn btn-success btn-sm">Modifier et renvoyer</button>
+                                            <a 
+                                                href="{% url 'notification:notification_app_index' %}" 
+                                                class="btn btn-secondary btn-sm">
+                                                Annuler
+                                            </a>
+                                            <a 
+                                                href="{% url 'notification:notification_app_delete' message.id %}" 
+                                                class="btn btn-danger btn-sm">Supprimer</a>
+                                        {% else %}
+                                            <button type="submit" class="btn btn-success btn-sm">Envoyer</button>
+                                            <button type="reset" class="btn btn-secondary btn-sm">Réinitialiser</button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="wrapper-detail-participants">
+                    <h2 class="mb-3 h-deco">
+                        Tous les messages envoyés
+                    </h2> 
+                    <div class="rempl">
+                        <div class="table-responsive tab-elmt scroll-tab-elmt-evang-boss">
+                            <table class="table table-hover" id="table-messages">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" rowspan="2">#</th>
+                                        <th scope="col" rowspan="2">Destination</th>
+                                        <th scope="col" rowspan="2">Description</th>
+                                        <th scope="col" rowspan="2">Autheur</th>
+                                        <th scope="col" rowspan="2">Détail</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for messag in messages_send %}
+                                        <tr {% if messag.id == message.id %} style="background-color: #b1cdec;"{% endif %}>
+                                            <th scope="row">{{ forloop.counter }}</th>
+                                            <td>
+                                                <ul style="margin-left: 15px; margin-top: 5px;">
+                                                    {% for dest in messag.receiver_message.all %}
+                                                        <li>{{ dest }} </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </td>
+                                            <td>{{ messag.body|truncatewords:7|linebreaks }}</td>
+                                            <td><b style="color: #2866ad;">{{ messag.author }}</b></td>
+                                            <td>
+                                                <a class="btn btn-primary btn-sm" 
+                                                    href="{% url 'notification:notification_app_index' messag.id %}">
+                                                    détail
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr style="color: #dc3545;">
+                                            <th scope="row">----</th>
+                                            <td>pas de donnée</td>
+                                            <td>pas de donnée</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="wrapper-tabl-evang">
+        <div class="row">
+            <div class="col-md-10">
+                <h2>Personnes ajoutés</h2>
+            </div>
+            <div class="col-md-2">
+                <div class="btn-personne-ajout">
+                    <a class="btn btn-success btn-sm" href="{% url 'notification:notification_app_ajouter_personne' %}">Ajouter</a>
+                </div>
+            </div>
+        </div>
+        {% include 'table-index.html' %}
+    </div>
+</div>
+{% endblock content %}
