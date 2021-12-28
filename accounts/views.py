@@ -17,7 +17,6 @@ from accounts.forms import LoginForm, UserRegistrationForm, UserEditForm, Profil
 from evangelisation.models import Profile
 
 
-
 def user_login(request):
     form = LoginForm()
     if request.method == 'POST':
@@ -36,18 +35,17 @@ def user_login(request):
     return render(request, 'accounts/login.html', {'form': form})
 
 
-
+@login_required(login_url="user_login")
 def tu_dois_etre_sauver(request):
     return render(request, 'accounts/tu_dois_etre_sauver.html')
 
 
-@login_required
 def user_logout(request):
     logout(request)
     return redirect('user_login')
 
 
-@login_required
+@login_required(login_url="user_login")
 def user_recherche(request):
     data = dict()
     users = None
@@ -77,7 +75,7 @@ def user_recherche(request):
     return  JsonResponse(data, safe=False)
 
 
-@login_required
+@login_required(login_url="user_login")
 def user_comptes(request):
     context = dict()
     if request.method == 'POST':
@@ -110,7 +108,7 @@ def user_comptes(request):
 
 
 
-@login_required
+@login_required(login_url="user_login")
 def user_register(request):
     form = None
     context = dict()
@@ -137,7 +135,7 @@ def user_register(request):
 
 
 
-@login_required
+@login_required(login_url="user_login")
 def user_edit(request):
     user_form = None
     profile_form = None
@@ -172,7 +170,7 @@ def user_edit(request):
 
 
 
-@login_required
+@login_required(login_url="user_login")
 def change_password(request):
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
@@ -188,12 +186,12 @@ def change_password(request):
     })
 
 
-@login_required
+@login_required(login_url="user_login")
 def password_change_done(request):
     return render(request, 'accounts/password_change_done.html')
 
 
-@login_required
+@login_required(login_url="user_login")
 def user_delete_users(request):
     list_users_id = request.POST.getlist('user_selected')
     for id in list_users_id:
@@ -209,7 +207,7 @@ def user_delete_users(request):
     
     return redirect('user_comptes')
 
-@login_required
+@login_required(login_url="user_login")
 def user_delete(request, pk):
     context = dict()
     try:
@@ -227,7 +225,7 @@ def user_delete(request, pk):
 
 
 
-@login_required
+@login_required(login_url="user_login")
 def user_detail(request, pk=None):
     user = None
     context = dict()
