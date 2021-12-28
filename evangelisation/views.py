@@ -148,7 +148,7 @@ def notification_app_detail_personne(request, pk):
     return render(request, 'pages/personne/personne.html', context)
 
 
-
+@login_required(login_url="user_login")
 def notification_app_supprimer_personne(request, pk):
     personne = get_object_or_404(Personne, id=pk)
     for msg in personne.messages.all():
